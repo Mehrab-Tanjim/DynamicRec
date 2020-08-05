@@ -1,15 +1,20 @@
 Sourcecode for the paper: "DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation". Please cite the paper if you find the code useful.
 
-Citation:
+## Citation:
 ```
-@inproceedings{title={DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation}, author={Md Mehrab Tanjim, Hammad Ayyubi, Garrison W. Cottrell}, booktitle={Proceedings of the 29th ACM International Conference on Information and Knowledge Management}, year={2020}, organization={ACM} }
+@inproceedings{
+    title={DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation},
+    author={Md Mehrab Tanjim, Hammad Ayyubi, Garrison W. Cottrell}, 
+    booktitle={Proceedings of the 29th ACM International Conference on Information and Knowledge Management}, 
+    year={2020}, 
+    organization={ACM} }
 ```
 
-##Requirements:
+## Requirements:
 Pytorch: Version >= 1.4.0
 Python: Version >= 3.6
 
-##Instructions: 
+## Instructions: 
 
 To run with default parameters, simply do: "python main.py"
 
