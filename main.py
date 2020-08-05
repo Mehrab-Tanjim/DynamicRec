@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
 
     parser.add_argument('--layers', default=2, type=int) 
-    parser.add_argument('--heads', default=200, type=int) 
+    parser.add_argument('--heads', default=1, type=int) 
 
     parser.add_argument('--decoder_kernel_size_list', default = [5, 5]) #depends on the number of layer
     
