@@ -1,14 +1,27 @@
-Implementation of dynamic convolution for next item recommendation
+Sourcecode for the paper: "DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation". Please cite the paper if you find the code useful.
 
-Instructions for some important parameters:
+Citation:
+```
+@inproceedings{title={DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation}, author={Md Mehrab Tanjim, Hammad Ayyubi, Garrison W. Cottrell}, booktitle={Proceedings of the 29th ACM International Conference on Information and Knowledge Management}, year={2020}, organization={ACM} }
+```
 
-'embed_dim' is set differently than dimension for feedforforward network 'ffn_embed_dim'
+##Requirements:
+Pytorch: Version >= 1.4.0
+Python: Version >= 3.6
 
-there are two dropouts: 'dropout' for dropout in FFN and 'weight_dropout' for FFN that changes kernel dynamically
-for now both of them are set to 0.0 
+##Instructions: 
 
-'layers' denotes the number of layers for dynamic convolution and 'heads' denotes how many ways we are dividing the embedding dimention for applying convolution
+To run with default parameters, simply do: "python main.py"
 
-'decoder_kernel_size_list' a list of number of kernels for each layer. For example, if layer == 2 then decoder_kernel_size_list =[5,5]. If only one number is given but number of layer is greater than one then the list is multiplied by the number of the layer (e.g. [5] will be expandded as [5,5])
-
-'num_neg_samples' denotes number of negative examples for training (default = 100)
+If you want to experiment with changing other parameters, following are the important parameters to change:
+'--dataset': Name of the dataset, the following are provided - 'nowplaying', 'diginetica', 'last_fm' (default), 'yoochoose'
+'--top_k': Top k prediction for calculating HitRate@k, and NDCG@k (default=10)
+'--batch_size': Default=128
+'--maxlen': Maximum length of the sequence (default=30)
+'--embed_dim': Embedding dimension (default=200)
+'--ffn_embed_dim': Embedding dimension for Feedforward Network (default=200)
+'--dropout': Dropout in FFN (default=0.2) 
+'--weight_dropout': Dropout in FFN for dynamic convolution (default=0.2)
+'--layers': Number of convolution layers (default=2) 
+'--decoder_kernel_size_list': Kernel size in each of the convolution layer (default = [5, 5]). Note each entry in this list correspoend to kernel size of each convolution layer
+'--num_neg_samples': Number of negative samples for calculating loss (default = 400)

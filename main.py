@@ -32,10 +32,10 @@ def str2bool(s):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dataset', default='nowplaying')
+    parser.add_argument('--dataset', default='last_fm')
     parser.add_argument('--top_k', default=10, type=int)
     
-    parser.add_argument('--train_dir', default='dev')
+    parser.add_argument('--train_dir', default='default')
     parser.add_argument('--batch_size', default=128, type=int)
     parser.add_argument('--lr', default=0.001, type=float)
 
