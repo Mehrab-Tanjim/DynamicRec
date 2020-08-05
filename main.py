@@ -11,7 +11,7 @@ from model import ConvRec
 from tqdm import tqdm
 # from util import *
 import pickle
-from util_session import *
+from util import *
 #%%
 
 import torch
@@ -32,7 +32,6 @@ def str2bool(s):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    #--dataset=Video --train_dir=default 
     parser.add_argument('--dataset', default='nowplaying')
     parser.add_argument('--top_k', default=10, type=int)
     
@@ -40,12 +39,11 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', default=128, type=int)
     parser.add_argument('--lr', default=0.001, type=float)
 
-    #model specific -- may need to change in model.py
     parser.add_argument('--maxlen', default=30, type=int)
 
     parser.add_argument('--embed_dim', default=200, type=int) 
     parser.add_argument('--ffn_embed_dim', default=200, type=int)
-    parser.add_argument('--dropout', default=0.2, type=float) #Helps to converge faster
+    parser.add_argument('--dropout', default=0.2, type=float) 
     parser.add_argument('--weight_dropout', default=0.2, type=float)
 
 
@@ -55,7 +53,7 @@ if __name__ == '__main__':
     parser.add_argument('--decoder_kernel_size_list', default = [5, 5]) #depends on the number of layer
     
     parser.add_argument('--num_epochs', default=30, type=int)
-    parser.add_argument('--num_neg_samples', default = 400, type=int) #TODO 100 is sufficient
+    parser.add_argument('--num_neg_samples', default = 400, type=int) #Note: 100 is sufficient
     parser.add_argument('--eval_epoch', default = 5, type=int)
     
     # Check if your system supports CUDA
@@ -78,7 +76,7 @@ if __name__ == '__main__':
         #if running from command line
         args = parser.parse_args()
     except:
-        #if running in ides
+        #if running in IDEs
         args = parser.parse_known_args()[0] 
 
     
@@ -123,20 +121,15 @@ if __name__ == '__main__':
     print("average length of sessions,", action/(len(train)+len(valid)+len(test)))
 
 
-    # TODO: for running other baselines
-    # saveAsNextItNetFormat(args.dataset, args.maxlen)
-    # saveAsGRUFormat(args.dataset, train, valid, test)
-
     num_batch = len(train) // args.batch_size
     print(num_batch)
-    #%%
     
     f = open(os.path.join(result_path, 'log.txt'), 'w')
     
     conv_model = ConvRec(args, itemnum)
     conv_model = conv_model.to(computing_device, non_blocking=True)
     
-    # TODO: testing a pretrained model
+    # Note: testing a pretrained model
     # if os.path.exists(result_path+"pretrained_model.pth"):
     #     conv_model = ConvRec(args, itemnum)#, True)
     #     conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))
@@ -154,8 +147,6 @@ if __name__ == '__main__':
 
     f.write(str(args)+'\n')
     f.flush()
-
-    # loss_log = open(os.path.join(opts.checkpoints_dir, 'loss_log.txt'), 'w')
     
 
     best_val_loss = 1e6
@@ -187,28 +178,8 @@ if __name__ == '__main__':
 
             seq = torch.LongTensor(seq).to(computing_device, non_blocking=True)
             pos = torch.LongTensor(pos).to(computing_device, non_blocking=True)
-            # neg = torch.LongTensor(neg).to(computing_device, non_blocking=True)
-            
-            # pos = torch.reshape(pos, (-1,))
-            # #batch x num_neg x seq_leng -> num_neg x batch x seq_leng
-            # neg = neg.transpose(0, 1)
-            # neg = torch.reshape(neg, (neg.size(0), -1,)) #TODO
 
-            # print("asi")
-            loss, _  = conv_model.forward(seq, pos=pos)#, neg=neg)
-
-            
-            # istarget = torch.ne(pos, 0).type(torch.FloatTensor).to(computing_device, non_blocking=True)
-
-            
-            # #TODO - improve the folllowing as we are comparing against all items, we have to push more for ranking
-            # negative_scores = torch.zeros(logits['neg_logits'].size(1)).to(computing_device, non_blocking=True)
-            # #
-            # for i in range(args.num_neg_samples):
-            #     negative_scores += (1 - torch.sigmoid(logits['neg_logits'][i]) + 1e-24).log() * istarget
-
-            # loss = torch.sum(-(torch.sigmoid(logits['pos_logits']) + 1e-24).log() * istarget - logits['neg_logits'])/torch.sum(istarget)
-
+            loss, _  = conv_model.forward(seq, pos=pos)
 
             epoch_losses.append(loss.item())
 
@@ -238,7 +209,7 @@ if __name__ == '__main__':
             else:
                 stop_count += 1
 
-            if stop_count == 3: #model did not improve 3 consequetive timesprint ('Evaluating'),
+            if stop_count == 3: #model did not improve 3 consequetive times
                 break
                 
         total_epochs += 1
