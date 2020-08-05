@@ -2,12 +2,13 @@ Sourcecode for the paper: "DynamicRec: A Dynamic Convolutional Network for Next 
 
 ## Citation:
 ```
-@inproceedings{
+@inproceedings {
     title={DynamicRec: A Dynamic Convolutional Network for Next Item Recommendation},
     author={Md Mehrab Tanjim, Hammad Ayyubi, Garrison W. Cottrell}, 
     booktitle={Proceedings of the 29th ACM International Conference on Information and Knowledge Management}, 
     year={2020}, 
-    organization={ACM} }
+    organization={ACM}
+}
 ```
 
 ## Requirements:
