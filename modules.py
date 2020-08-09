@@ -41,7 +41,14 @@ def unfold1d(x, kernel_size, padding_l, pad_value=0):
     return x
 
 class DynamicConv1dTBC(nn.Module):
-    '''Dynamic lightweight convolution taking T x B x C inputs
+
+    '''
+    # Copyright (c) Facebook, Inc. and its affiliates.
+    #
+    # This source code is licensed under the MIT license found in the
+    # LICENSE file in the root directory of this source tree: https://github.com/pytorch/fairseq
+    # 
+    # Dynamic lightweight convolution taking T x B x C inputs
     Args:
         input_size: # of channels of the input
         kernel_size: convolution channels
@@ -78,7 +85,7 @@ class DynamicConv1dTBC(nn.Module):
         self.weight_softmax = weight_softmax
         self.renorm_padding = renorm_padding
         self.unfold = unfold
-        self.weight_linear = Linear(self.query_size, num_heads * kernel_size * 1, bias=bias) #query plus user
+        self.weight_linear = Linear(self.query_size, num_heads * kernel_size * 1, bias=bias) 
 
         if conv_bias:
             self.conv_bias = nn.Parameter(torch.Tensor(input_size))
@@ -124,7 +131,7 @@ class DynamicConv1dTBC(nn.Module):
         assert R * H == C == self.input_size
 
         
-        weight = self.weight_linear(query).view(T*B*H, -1) #generat user specific weights
+        weight = self.weight_linear(query).view(T*B*H, -1) 
         
         weight = F.dropout(weight, self.weight_dropout, training=self.training, inplace=False)
 
