@@ -112,8 +112,7 @@ if __name__ == '__main__':
     
     # Note: testing a pretrained model
     if os.path.exists(result_path+"pretrained_model.pth"):
-        conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))
-        conv_model = conv_model.to(args.computing_device)        
+        conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))       
         t_test = evaluate(conv_model, test, itemnum, args, num_workers=4)
         model_performance = "Model performance on test: "+str(t_test)
         print(model_performance)
@@ -171,7 +170,7 @@ if __name__ == '__main__':
 
             t_valid = evaluate(conv_model, valid, itemnum, args, num_workers=4)
             
-            print ('\nnum of steps:%d, time: %f(s), valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f), valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f)' % (total_epochs, T, args.top_k, t_valid[0], args.top_k, t_valid[1], args.top_k, t_valid[2],
+            print ('\nnum of steps:%d, valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f), valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f)' % (total_epochs, args.top_k, t_valid[0], args.top_k, t_valid[1], args.top_k, t_valid[2],
             args.top_k+10, t_valid[3], args.top_k+10, t_valid[4], args.top_k+10, t_valid[5]))
 
             f.write(str(t_valid) + '\n')
