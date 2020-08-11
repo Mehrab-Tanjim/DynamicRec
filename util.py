@@ -178,11 +178,11 @@ def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_est
 
     dataset = Dataset(test_sessions, args, itemnum, False)
 
-    sampler = torch.utils.data.DataLoader(dataset, batch_size=128, num_workers=4, pin_memory=True)
+    sampler = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, num_workers=4, pin_memory=True)
 
     with torch.no_grad():
             
-        for step, (seq, grouth_truth) in tqdm(enumerate(sampler), total=len(sampler)): #TODO remove tqdm for releasing the code
+        for step, (seq, grouth_truth) in tqdm(enumerate(sampler), total=len(sampler)): 
 
             #safety check
             

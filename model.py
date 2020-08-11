@@ -67,7 +67,7 @@ class ConvRec(nn.Module):
             pos = torch.reshape(pos, (-1,))
 
             nnz = torch.ne(pos, 0).nonzero().squeeze(-1)
-            neg = torch.randint(1,self.itemnum+1, (self.args.num_neg_samples, nnz.size(0)), device=self.args.computing_device) #TODO
+            neg = torch.randint(1,self.itemnum+1, (self.args.num_neg_samples, nnz.size(0)), device=self.args.computing_device)
 
             pos_emb = self.item_embedding(pos[nnz])
             neg_emb = self.item_embedding(neg)
