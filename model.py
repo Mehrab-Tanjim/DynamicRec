@@ -1,6 +1,4 @@
-
 import math
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -56,7 +54,7 @@ class ConvRec(nn.Module):
         # T x B x C -> B x T x C
         x = x.transpose(0, 1)
         
-        seq_emb = x.contiguous().view(-1, x.size(-1)) # reshaping it to [tf.shape(self.input_seq)[0] * args.maxlen x args.hidden_units
+        seq_emb = x.contiguous().view(-1, x.size(-1)) # reshaping it to [arg.batch_size x args.maxlen * args.hidden_units]
         pos_logits = None 
         neg_logits = None 
         rank_20 = None 
@@ -80,8 +78,6 @@ class ConvRec(nn.Module):
 
             loss = torch.sum(-(torch.sigmoid(pos_logits) + 1e-24).log() - negative_scores)/nnz.size(0)
 
-            
-            
                 
         if test_item is not None:        
 
@@ -136,9 +132,9 @@ class ConvRecLayer(nn.Module):
 
 def add_args(args):
 
-    if len(args.decoder_kernel_size_list) == 1:
+    if len(args.decoder_kernel_size_list) == 1: # For safety in case kernel size list does not match with # of convolution layers
         args.decoder_kernel_size_list = args.decoder_kernel_size_list * args.layers
 
     args.weight_softmax = True
 
-    print("model arguments", args)
+    print("Model arguments", args)

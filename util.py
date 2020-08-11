@@ -1,37 +1,11 @@
-import sys
-import copy
 import random
 import numpy as np
 from collections import defaultdict
 from random import shuffle
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-from torch.autograd import Variable
 import pandas as pd
 from tqdm import tqdm
-
-from matplotlib import pyplot as plot
 from sampler import Dataset
-
-def random_neq(l, r, s):
-    t = np.random.randint(l, r)
-    while t in s:
-        t = np.random.randint(l, r)
-    return t
-
-def random_neq_from_session(os, itemnum, ts):
-    diff = os.difference(ts)
-    if bool(diff): #not empty
-        t = random.sample(diff, 1)
-        return t[0]
-    #else if empty    
-    t = np.random.randint(1, itemnum+1)
-
-    while t in ts:
-        t = np.random.randint(1, itemnum+1)
-    return t
 
 def data_partition(fname, percentage=[0.1, 0.2]):
     itemnum = 0
@@ -67,8 +41,6 @@ def data_partition(fname, percentage=[0.1, 0.2]):
 
     total_sessions = session_id
     
-    #np.random.seed(10)
-
     shuffle_indices = np.random.permutation(range(total_sessions)) #
     
     train_index = int(total_sessions*(1 - valid_perc - test_perc))
@@ -114,8 +86,7 @@ def saveAsNextItNetFormat(fname, maxlen):
         for i in reversed(items):
             seq[idx] = i
             idx -= 1
-            if idx == -1: break
-        
+            if idx == -1: break        
         
         sessions.append(seq)
         
@@ -157,7 +128,7 @@ def saveAsGRUFormat(fname, user_train, user_valid, user_test):
     test_data.to_csv(fname+'_grurec_test_data.csv',  sep=' ', index=None)
 
 
-def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_estimation=False):
+def evaluate(model, test_sessions, itemnum, args, num_workers=4):
     #set the environment
     model.eval()
     
@@ -171,22 +142,19 @@ def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_est
 
     valid_sessions = 0.0
 
-    #putting the item in the top
 
     all_items = np.array(range(1, itemnum+1))
-    all_items_tensor = torch.LongTensor(all_items).to(computing_device, non_blocking=True)
+    all_items_tensor = torch.LongTensor(all_items).to(args.computing_device, non_blocking=True)
 
     dataset = Dataset(test_sessions, args, itemnum, False)
 
-    sampler = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, num_workers=4, pin_memory=True)
+    sampler = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size, num_workers=num_workers, pin_memory=True)
 
     with torch.no_grad():
             
         for step, (seq, grouth_truth) in tqdm(enumerate(sampler), total=len(sampler)): 
 
-            #safety check
-            
-            seq = torch.LongTensor(seq).to(computing_device, non_blocking=True)
+            seq = torch.LongTensor(seq).to(args.computing_device, non_blocking=True)
             
             _, rank_20 = model.forward(seq, test_item = all_items_tensor)
 
@@ -217,9 +185,9 @@ def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_est
                         HT_plus_10 += 1
                 
             except:
-                continue
+                continue #where rank returns none
                     
-        valid_sessions = len(test_sessions)
+        valid_sessions = len(dataset)
 
     return MRR / valid_sessions, NDCG / valid_sessions, HT / valid_sessions, MRR_plus_10 / valid_sessions, NDCG_plus_10 / valid_sessions, HT_plus_10 / valid_sessions
 

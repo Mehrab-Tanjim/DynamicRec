@@ -1,6 +1,4 @@
 import numpy as np
-
-import torch
 from torch.utils import data
 
 class Dataset(data.Dataset):
@@ -43,7 +41,7 @@ class Dataset(data.Dataset):
                 idx -= 1
                 if idx == -1: break
 
-            return seq, session[-1]-1 #Index # np.where(self.all_items == session[-1])[0][0]
+            return seq, session[-1]-1 #index of the item in the list of all items
 
     def __getitem__(self, index):
             'Generates one sample of data'
@@ -54,10 +52,3 @@ class Dataset(data.Dataset):
             else:
                 return self.__test__(index)
             
-
-
-def random_neq(l, r, s):
-    t = np.random.randint(l, r)
-    while t in s:
-        t = np.random.randint(l, r)
-    return t

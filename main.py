@@ -1,34 +1,15 @@
-#%%
 import os
-import time
 import argparse
 import csv
-#%%
 import numpy as np
-#%%
 from sampler import Dataset
 from model import ConvRec
 from tqdm import tqdm
-# from util import *
 import pickle
 from util import *
-#%%
-
 import torch
-import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
-from torch.autograd import Variable
-#%%
 
-
-
-def str2bool(s):
-    if s not in {'False', 'True'}:
-        raise ValueError('Not a valid boolean string')
-    return s == 'True'
-
-#%%
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -102,8 +83,8 @@ if __name__ == '__main__':
     
     [train, valid, test, itemnum] = dataset
     
-    print("number of sessions,",len(train)+len(valid)+len(test))
-    print("number of items,", itemnum)
+    print("Number of sessions:",len(train)+len(valid)+len(test))
+    print("Number of items:", itemnum)
 
     action = 0
     for i in train:
@@ -116,34 +97,29 @@ if __name__ == '__main__':
     for i in test:
         action += np.count_nonzero(i)
 
-    print("number of actions,", action)
+    print("Number of actions:", action)
     
-    print("average length of sessions,", action/(len(train)+len(valid)+len(test)))
+    print("Average length of sessions:", action/(len(train)+len(valid)+len(test)))
 
 
     num_batch = len(train) // args.batch_size
-    print(num_batch)
+    print("The batch size is:", num_batch)
     
     f = open(os.path.join(result_path, 'log.txt'), 'w')
     
     conv_model = ConvRec(args, itemnum)
-    conv_model = conv_model.to(computing_device, non_blocking=True)
+    conv_model = conv_model.to(args.computing_device, non_blocking=True)
     
     # Note: testing a pretrained model
-    # if os.path.exists(result_path+"pretrained_model.pth"):
-    #     conv_model = ConvRec(args, itemnum)#, True)
-    #     conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))
-    #     conv_model = conv_model.to(computing_device)        
-    #     t_test = evaluate(conv_model, test, itemnum, args, computing_device, False)
-    #     model_performance = "model performance on test"+str(t_test)
-    #     print (model_performance)
+    if os.path.exists(result_path+"pretrained_model.pth"):
+        conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))
+        conv_model = conv_model.to(args.computing_device)        
+        t_test = evaluate(conv_model, test, itemnum, args, num_workers=4)
+        model_performance = "Model performance on test: "+str(t_test)
+        print(model_performance)
 
 
-    T = 0.0
-    t0 = time.time()
-
-
-    optimizer = optim.Adam(conv_model.parameters(), lr = args.lr, betas=(0.9, 0.98),weight_decay = 0.0)
+    optimizer = optim.Adam(conv_model.parameters(), lr = args.lr, betas=(0.9, 0.98), weight_decay = 0.0)
 
     f.write(str(args)+'\n')
     f.flush()
@@ -176,8 +152,8 @@ if __name__ == '__main__':
             optimizer.zero_grad()
 
 
-            seq = torch.LongTensor(seq).to(computing_device, non_blocking=True)
-            pos = torch.LongTensor(pos).to(computing_device, non_blocking=True)
+            seq = torch.LongTensor(seq).to(args.computing_device, non_blocking=True)
+            pos = torch.LongTensor(pos).to(args.computing_device, non_blocking=True)
 
             loss, _  = conv_model.forward(seq, pos=pos)
 
@@ -193,7 +169,7 @@ if __name__ == '__main__':
         
         if total_epochs % args.eval_epoch == 0:
 
-            t_valid = evaluate(conv_model, valid, itemnum, args, computing_device)
+            t_valid = evaluate(conv_model, valid, itemnum, args, num_workers=4)
             
             print ('\nnum of steps:%d, time: %f(s), valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f), valid (MRR@%d: %.4f, NDCG@%d: %.4f, HR@%d: %.4f)' % (total_epochs, T, args.top_k, t_valid[0], args.top_k, t_valid[1], args.top_k, t_valid[2],
             args.top_k+10, t_valid[3], args.top_k+10, t_valid[4], args.top_k+10, t_valid[5]))
@@ -216,17 +192,16 @@ if __name__ == '__main__':
 
         train_loss = np.mean(epoch_losses)
         print(str(epoch) + "epoch loss", train_loss)
-        
-    
-        
+
+
     conv_model = ConvRec(args, itemnum)
     conv_model.load_state_dict(torch.load(result_path+"pretrained_model.pth"))
     
-    conv_model = conv_model.to(computing_device)
+    conv_model = conv_model.to(args.computing_device)
         
-    t_test = evaluate(conv_model, test, itemnum, args, computing_device)
+    t_test = evaluate(conv_model, test, itemnum, args, num_workers=4)
 
-    model_performance = "model performance on test"+str(t_test)
+    model_performance = "Model performance on test: "+str(t_test)
     print(model_performance)
 
     f.write(model_performance+'\n')
@@ -234,6 +209,3 @@ if __name__ == '__main__':
     f.close()
 
     print("Done")
-
-
-# %%
