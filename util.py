@@ -165,9 +165,9 @@ def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_est
     NDCG = 0.0
     HT = 0.0
 
-    MRR_plus_15 = 0.0
-    NDCG_plus_15 = 0.0
-    HT_plus_15 = 0.0
+    MRR_plus_10 = 0.0
+    NDCG_plus_10 = 0.0
+    HT_plus_10 = 0.0
 
     valid_sessions = 0.0
 
@@ -212,14 +212,14 @@ def evaluate(model, test_sessions, itemnum, args, computing_device, unbiased_est
 
                     if rank < args.top_k + 10:
 
-                        MRR_plus_15 += 1.0/(rank + 1)
-                        NDCG_plus_15 += 1 / np.log2(rank + 2)
-                        HT_plus_15 += 1
+                        MRR_plus_10 += 1.0/(rank + 1)
+                        NDCG_plus_10 += 1 / np.log2(rank + 2)
+                        HT_plus_10 += 1
                 
             except:
                 continue
                     
         valid_sessions = len(test_sessions)
 
-    return MRR / valid_sessions, NDCG / valid_sessions, HT / valid_sessions, MRR_plus_15 / valid_sessions, NDCG_plus_15 / valid_sessions, HT_plus_15 / valid_sessions
+    return MRR / valid_sessions, NDCG / valid_sessions, HT / valid_sessions, MRR_plus_10 / valid_sessions, NDCG_plus_10 / valid_sessions, HT_plus_10 / valid_sessions
 
